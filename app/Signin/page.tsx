@@ -1,50 +1,68 @@
-'use client'
-import { Button, Container, CssBaseline, TextField, Typography } from "@mui/material";
-import React from "react";
+"use client";
+import {
+  Button,
+  Container,
+  CssBaseline,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { DefaultValues } from "react-hook-form";
 import { signinSchema, signupSchema } from "../schme";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import bcrypt from "bcryptjs";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
+  const router = useRouter();
 
-    const defaultValues: DefaultValues<formData> = {
-        email: "",
-        password: "",
-    };
+  const [emailError, setEmailError] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const defaultValues: DefaultValues<formData> = {
+    email: "",
+    password: "",
+  };
 
-    const comparePassword = (password : string)=>{
-        const users = JSON.parse(localStorage.getItem("users") || "[]");
-        return bcrypt.compare(password,users.password)
+  type formData = z.infer<typeof signinSchema>;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, touchedFields },
+  } = useForm({
+    resolver: zodResolver(signinSchema),
+  });
+
+  const onSubmit = (data: formData) => {
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find((user: any) => user.email === data.email);
+
+    // console.log("gngngjnfjkn", user);
+    if (!user) {
+      setEmailError("User doesn't exists");
+      return;
     }
 
-    type formData = z.infer<typeof signinSchema>;
-    const {register, handleSubmit, formState:{errors, touchedFields}} = useForm({
-        resolver : zodResolver(signinSchema)
-    })
-
-    const onSubmit = (data : formData)=>{
-        const users = JSON.parse(localStorage.getItem("users") || "[]")
-        const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
-        const userWithToken={
-            ...data,
-            token
-        }
-
-        users.push(userWithToken)
-        localStorage.setItem("uses", JSON.stringify(users));
+    const isMatch = bcrypt.compareSync(data.password, user.password);
+    if (!isMatch) {
+      setLoginError("Incorrect Password");
+      return;
     }
 
-    const logout = () =>{
-        const users = JSON.parse(localStorage.getItem("users") || "[]");
-        
-    }
+    setLoginError("");
+    const token =
+      Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem("token", token);
+    localStorage.setItem("loggedInUser", data.email);
 
+    router.push("/products");
+  };
+
+  
 
   return (
-    <Container>
+    <Container component="main" maxWidth="xs">
       <CssBaseline enableColorScheme />
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -52,10 +70,6 @@ export default function SignIn() {
           Signin
         </Typography>
 
-        
-
-        
-        
         <TextField
           label="Email"
           type="email"
@@ -77,11 +91,11 @@ export default function SignIn() {
           error={!!errors.password && touchedFields.password}
           helperText={errors.password?.message}
         />
-       
+
         <Button type="submit" variant="contained" color="primary">
           Submit
         </Button>
       </form>
     </Container>
-  )
+  );
 }

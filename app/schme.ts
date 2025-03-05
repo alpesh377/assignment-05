@@ -47,8 +47,28 @@ export const signupSchema = z.object({
     .min(10, "number must 10 digit long")
     .max(10, "enter 10 digit number"),
 });
+export const editProfileSchema = z.object({
+  firstname: firstnameValidation,
+  lastname: lastnameValidation,
+  email: emailValidation,
+  mobileNumber: z
+    .string()
+    .min(10, "number must 10 digit long")
+    .max(10, "enter 10 digit number"),
+});
 
 export const signinSchema = z.object({
   email : emailValidation,
   password : passwordvalidation
 })
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: passwordvalidation,
+    password: passwordvalidation,
+    confirmPassword: passwordvalidation,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // path of error
+  });

@@ -1,10 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Grid2, Pagination } from "@mui/material";
+import { Grid, Grid2, Pagination } from "@mui/material";
 import ProductCard from "@/components/Card";
+import { useRouter } from "next/navigation";
 
 export default function Products() {
+  const router = useRouter()
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalPage, setTotalPage] = useState(0)
@@ -15,6 +17,22 @@ export default function Products() {
     console.log("Value : ", value)
     setPage(value);
   }
+  useEffect(() => {
+    const email = localStorage.getItem("loggedInUser");
+    const token = localStorage.getItem("token")
+    
+    if (!email) {
+      router.push("signin");
+      return;
+    }
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find((u: any) => u.email === email);
+
+    if (!user) {
+      router.push("signin");
+      return;
+    }
+  }, [router]);
   
   useEffect(() => {
     const getData = async () => {
@@ -23,7 +41,7 @@ export default function Products() {
       );
       console.log(res);
       setProducts(res.data.products);
-      setTotalPage(Math.ceil(res.data.data.total/8))
+      setTotalPage(Math.ceil(res.data.total/8))
     };
 
     getData();
@@ -33,15 +51,17 @@ export default function Products() {
 
   return (
     <>
-      <Grid2
+      <Grid
         container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 3, sm: 8, md: 12 }}
+        spacing={3}
+        marginTop={3}
+        p={2}
       >
         {products.map((product:any) => (
-          <Grid2 key={product.id} size={{ xs: 2, sm: 4, md: 4,lg:5 }}>
+          <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
             <ProductCard
               key={product.id}
+              id={product.id}
               thumbnail ={product.thumbnail}
               title = {product.title}
               description = {product.description}
@@ -51,10 +71,10 @@ export default function Products() {
               price={product.price}
               discountPercentage={product.discountPercentage}
             />
-          </Grid2>
+          </Grid>
         ))}
-      </Grid2>
-      <Pagination count={4} page={page} onChange={handleChange} size="small" />
+      </Grid>
+      <Pagination count={totalPage} page={page} onChange={handleChange}  sx={{display:"flex", alignItems:"center", justifyContent:"center", mt:4}} size="large" />
     </>
   );
 }

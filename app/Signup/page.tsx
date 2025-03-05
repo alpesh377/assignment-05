@@ -1,18 +1,31 @@
 'use client'
 
 import { Button, Container, CssBaseline, TextField, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { DefaultValues } from "react-hook-form";
 import { signupSchema } from "../schme";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import bcrypt from "bcryptjs";
+import { useRouter } from "next/navigation";
 
 
 
 export default function SignUp() {
+
+  const router = useRouter();
+  const [emailError, setEmailError] = useState("")
   type formData = z.infer<typeof signupSchema>;
+  useEffect(()=>{
+const email = localStorage.getItem("loggedInUser")
+const token = localStorage.getItem("token")
+    if(!email && !token){
+      router.push("/signup")
+    }else{
+      router.push("/products")
+    }
+  },[router])
   const {
     handleSubmit,
     register,
@@ -22,7 +35,7 @@ export default function SignUp() {
   });
 
   const encryptPassword = async (password:string) =>{
-    const encryptedpassword = await bcrypt.hash(password, 10);
+    const encryptedpassword = await bcrypt.hashSync(password);
     return encryptedpassword;
   }
   const defaultValues: DefaultValues<formData> = {
@@ -35,22 +48,22 @@ export default function SignUp() {
 
   const onSubmit = async (data: formData) => {
     const users = JSON.parse(localStorage.getItem("users") || "[]")
-
     const emailExists = users.some((user:any) => user.email  === data.email)
     
     if(emailExists){
-        throw new Error("User already Exists")
+        setEmailError("Email Already Exists")
+        return
     }
 
+    setEmailError('')
+    const hashed = bcrypt.hashSync(data.password)
     const encryptedData = {
       ...data,
-      password : encryptPassword(data.password)
+      password : hashed
     }
-
     users.push(encryptedData);
-    localStorage.setItem("uses", JSON.stringify(users));
-    
-    const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem("users", JSON.stringify(users));
+    router.push("/signin")
   };
   return (
     <Container>
@@ -110,6 +123,13 @@ export default function SignUp() {
           error={!!errors.mobileNumber && touchedFields.mobileNumber}
           helperText={errors.mobileNumber?.message}
         />
+        {
+          emailError && (
+            <Typography>
+              {emailError}
+            </Typography>
+          )
+        }
 
         <Button type="submit" variant="contained" color="primary">
           Submit
