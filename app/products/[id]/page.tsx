@@ -1,6 +1,12 @@
-
 import axios from "axios";
-import { Button, Card, CardMedia, Container, Grid } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardMedia,
+  Container,
+  Grid,
+  Typography,
+} from "@mui/material";
 
 import ProductDetail from "@/components/ProductDetail";
 
@@ -24,9 +30,7 @@ interface ProductPageProp {
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProp) {  
-
-
+export default async function ProductPage({ params }: ProductPageProp) {
   const getData = async (id: string) => {
     const res = await axios.get(`https://dummyjson.com/products/${id}`);
     console.log(res.data);
@@ -62,6 +66,9 @@ export default async function ProductPage({ params }: ProductPageProp) {
   //   }, [id]);
 
   // console.log(products)
+  if (!products) {
+    return <Typography>No products Found</Typography>;
+  }
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <ProductDetail product={products} />

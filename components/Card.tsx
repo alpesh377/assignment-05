@@ -47,7 +47,7 @@ const ProductCard: React.FC<cardProp> = (data: cardProp) => {
           height="200"
           sx={{objectFit: "contain" }}
           image={data.thumbnail}
-          title="green iguana"
+          title={data.title}
         />
         <CardContent sx={{flexGrow:1}}>
           <Typography gutterBottom variant="h6" component="div" flexWrap={"wrap"}>
