@@ -91,7 +91,8 @@ export default function SignIn() {
           error={!!errors.password && touchedFields.password}
           helperText={errors.password?.message}
         />
-
+        {emailError && <Typography>{emailError}</Typography>}
+        {loginError && <Typography color="error" >{loginError}</Typography>}
         <Button type="submit" variant="contained" color="primary">
           Submit
         </Button>

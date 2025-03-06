@@ -31,7 +31,7 @@ const ProductCard: React.FC<cardProp> = (data: cardProp) => {
 
   const router = useRouter()
   const handleProduct = (id:string) =>{
-    router.replace(`/products/${id}`);
+    router.push(`/products/${id}`);
   }
   return (
     <Card

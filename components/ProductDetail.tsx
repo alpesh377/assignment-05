@@ -1,3 +1,4 @@
+'use client'
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -28,7 +29,7 @@ interface Product {
   rating: number;
   price: number;
   discountPercentage: number;
-  stock: string;
+  stock: number;
   images: string[];
   [key: string]: any;
 }
@@ -37,10 +38,27 @@ interface ProductProp {
   product: Product | null;
 }
 
-export default function ProductDetail({ product,productRaing }: any) {
+export default function ProductDetail({ product}:ProductProp) {
   const router = useRouter();
-  console.log(product);
+  console.log({product});
   const [selectImage, setSelectImage] = useState(product?.images[0]);
+
+  const excludedProperties =[
+    "id",
+    "thumbnail",
+    "title",
+    "description",
+    "category",
+    "brand",
+    "rating",
+    "price",
+    "discountPercentage",
+    "stock",
+    "images"
+  ]
+
+  // const otherProp = Object.entries(product).filter(([key]) => !excludedProperties.includes(key))
+  // console.log("Othere ",otherProp)
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Button
@@ -79,7 +97,7 @@ export default function ProductDetail({ product,productRaing }: any) {
                 onClick={() => setSelectImage(image)}
               >
                 <CardMedia
-                  component="image"
+                  component="img"
                   image={image}
                   sx={{
                     height: 80,
@@ -96,7 +114,7 @@ export default function ProductDetail({ product,productRaing }: any) {
           </Typography>
           <Box display="flex" alignItems="center" mb={1}>
             <Rating
-              value={productRaing}
+              value={product?.rating}
               readOnly
               size="small"
               precision={0.1}
@@ -149,7 +167,7 @@ export default function ProductDetail({ product,productRaing }: any) {
               />
             </Box>
             <Typography variant="body2" color="textSecondary">
-              {product?.stock > 0 ? "In Stock" : "Out of the stock"}
+              {product.stock > 0 ? "In Stock" : "Out of the stock"}
             </Typography>
           </Box>
           <Typography variant="body1" component="p">
@@ -160,7 +178,7 @@ export default function ProductDetail({ product,productRaing }: any) {
               variant="outlined"
               size="large"
               startIcon={<ShoppingCart />}
-              disabled={product?.stock < 0}
+              disabled={product.stock < 0}
             >
               Add to Cart
             </Button>

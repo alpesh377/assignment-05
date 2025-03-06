@@ -1,12 +1,8 @@
-'use client'
+
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { useParams } from 'next/navigation'
 import { Button, Card, CardMedia, Container, Grid } from "@mui/material";
 
 import ProductDetail from "@/components/ProductDetail";
-
 
 interface Product {
   id: string;
@@ -22,47 +18,53 @@ interface Product {
   images: string[];
   [key: string]: any;
 }
+interface ProductPageProp {
+  params: {
+    id: string;
+  };
+}
+
+export default async function ProductPage({ params }: ProductPageProp) {  
 
 
-export default function ProductPage() {
-    const router = useRouter();
-    const params = useParams();
-    const { id } = params;
-    // console.log("id", id)
-    const [products, setProducts] = useState<any>();
-    useEffect(() => {
-        const email = localStorage.getItem("loggedInUser");
-        const token = localStorage.getItem("token")
-        
-        if (!email) {
-          router.push("signin");
-          return;
-        }
-        const users = JSON.parse(localStorage.getItem("users") || "[]");
-        const user = users.find((u: any) => u.email === email);
-    
-        if (!user) {
-          router.push("signin");
-          return;
-        }
-      }, [router]);
-    useEffect(() => {
-        const getData = async () => {
-          const res = await axios.get(
-            `https://dummyjson.com/products/${id}`
-          );
-          console.log(res.data);
-          setProducts(res.data);
-          
-        };
-    
-        getData();
-      }, [id]);
+  const getData = async (id: string) => {
+    const res = await axios.get(`https://dummyjson.com/products/${id}`);
+    console.log(res.data);
+    return res.data;
+  };
+  const products = await getData(params.id);
+  // useEffect(() => {
+  //   const email = localStorage.getItem("loggedInUser");
+  //   const token = localStorage.getItem("token");
 
-      // console.log(products)
+  //   if (!email) {
+  //     router.push("signin");
+  //     return;
+  //   }
+  //   const users = JSON.parse(localStorage.getItem("users") || "[]");
+  //   const user = users.find((u: any) => u.email === email);
+
+  //   if (!user) {
+  //     router.push("signin");
+  //     return;
+  //   }
+  // }, [router]);
+  // useEffect(() => {
+  //     const getData = async (id:string) => {
+  //       const res = await axios.get(
+  //         `https://dummyjson.com/products/${id}`
+  //       );
+  //       console.log(res.data);
+  //       setProducts(res.data);
+
+  //     };
+
+  //   }, [id]);
+
+  // console.log(products)
   return (
-    <Container maxWidth="lg" sx={{py:4}}>
-        <ProductDetail product={products} productrating = {products?.rating}/>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <ProductDetail product={products} />
     </Container>
-  )
+  );
 }

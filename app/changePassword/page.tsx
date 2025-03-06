@@ -95,7 +95,7 @@ export default function ChangePassword() {
         />
 
         <TextField
-          label="Password"
+          label="New Password"
           type="password"
           fullWidth
           margin="normal"

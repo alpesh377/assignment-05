@@ -40,7 +40,7 @@ export default function Appbar() {
       router.push("signin");
       return;
     }
-  }, []);
+  }, [token]);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };

@@ -125,7 +125,7 @@ const token = localStorage.getItem("token")
         />
         {
           emailError && (
-            <Typography>
+            <Typography color="error">
               {emailError}
             </Typography>
           )
